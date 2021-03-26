@@ -1,4 +1,4 @@
-# mrs-tag-cleanup
+# msr-tag-cleanup
 
 ## get-tags
 
