@@ -6,85 +6,57 @@ cleanup() {
   # script cleanup here
 }
 
+MSR_USER=
+MSR_PASSWORD=
 
-DTR_REPO=$1
-if [[ -z $DTR_REPO ]] ; then
-  echo "DTR Repo is required. E.g. 'gui/my-service'"
+IMAGE=${1:-}
+if [[ -z $IMAGE ]] ; then
+  echo "IMAGE is required. E.g. 'my.msr-registry.com/org/my-service'"
   exit 1
 fi
-FILE="temp/${DTR_REPO}.json"
 
+MSR_URL=$(echo $IMAGE | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\1/p')
+ORG=$(echo $IMAGE     | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\2/p')
+REPO=$(echo $IMAGE    | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\3/p')
+FILE="temp/${ORG}/${REPO}.json"
 
-DTR_URL=${bamboo_DTR_URL:-dtr.cnvr.net}
-DTR_USER=${bamboo_DTR_USER:-}
-DTR_PASSWORD=${bamboo_DTR_PASSWORD:-}
+echo
+echo "####################### WARNING! #######################"
+echo "You are about to delete tags for $IMAGE"
+echo "Tags to be deleted are located in ./$FILE"
 
-# hook for local testing
-if [[ -z $DTR_USER ]] ; then
-  echo "DTR User:" 
-  read DTR_USER
+if [[ -z $MSR_USER ]] ; then
+  echo && echo "MSR User:" 
+  read MSR_USER
 fi
-if [[ ! -z $DTR_USER ]] && [[ -z $DTR_PASSWORD ]] ; then
-  echo "DTR Password for $DTR_USER:" 
-  read -s DTR_PASSWORD
+if [[ ! -z $MSR_USER ]] && [[ -z $MSR_PASSWORD ]] ; then
+  echo && echo "Password for $MSR_USER:" 
+  read -s MSR_PASSWORD
 fi
 
-function login() {
-  LOGIN_FILE="temp/.login"
-  curl -sSL -D $LOGIN_FILE \
-    -X "POST" \
-    -H "Connection: keep-alive" \
-    -H "Pragma: no-cache" \
-    -H "Cache-Control: no-cache" \
-    -H "sec-ch-ua: \"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"" \
-    -H "Accept: application/json, text/plain, */*" \
-    -H "X-Csrf-Token: undefined" \
-    -H "sec-ch-ua-mobile: ?0" \
-    -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -H "Origin: https://$DTR_URL" \
-    -H "Sec-Fetch-Site: same-origin" \
-    -H "Sec-Fetch-Mode: cors" \
-    -H "Sec-Fetch-Dest: empty" \
-    -H "Referer: https://$DTR_URL/login" \
-    -H "Accept-Language: en-US,en;q=0.9" \
-    --data-raw "username=$DTR_USER&password=$DTR_PASSWORD" \
-    "https://$DTR_URL/login_submit"
-
-  SESSION=$(cat $LOGIN_FILE | grep root_session | sed -n -e 's/.*root_session=\([^;]*\);.*/\1/p')
-  TOKEN=$(cat $LOGIN_FILE | grep csrftoken | sed -n -e 's/.*csrftoken=\([^;]*\);.*/\1/p')
-}
+if [[ -z $MSR_USER ]] || [[ -z $MSR_PASSWORD ]]; then
+  echo && echo "User & Password are required."
+  exit 1
+fi
 
 function delete_tag() {
   TAG=$1
-  URL="https://${DTR_URL}/api/v0/repositories/${DTR_REPO}/tags/$TAG"
+  URL="https://${MSR_URL}/api/v0/repositories/${ORG}/${REPO}/tags/${TAG}"
   curl \
     -X "DELETE" \
-    -H "Connection: keep-alive" \
-    -H "Pragma: no-cache" \
-    -H "Cache-Control: no-cache" \
-    -H "sec-ch-ua: \"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"" \
     -H "accept: application/json" \
-    -H "X-Csrf-Token: $TOKEN" \
-    -H "sec-ch-ua-mobile: ?0" \
-    -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36" \
     -H "Content-Type: application/json" \
-    -H "Origin: https://dtr.cnvr.net" \
-    -H "Sec-Fetch-Site: same-origin" \
-    -H "Sec-Fetch-Mode: cors" \
-    -H "Sec-Fetch-Dest: empty" \
-    -H "Referer: https://dtr.cnvr.net/docs/api" \
-    -H "Accept-Language: en-US,en;q=0.9" \
-    -H "Cookie: _ga=GA1.2.1648158083.1603721138; root_session=$SESSION; csrftoken=$TOKEN" \
-    ${URL}
+    ${URL} \
+    -K- <<< "-u ${MSR_USER}:${MSR_PASSWORD}"
 }
 
-# if file exists .docker/config.json
-if [[ ! -z $DTR_PASSWORD ]] ; then
-  login
-  while read LINE; do
-    TAG=$(echo $LINE | jq -r '.name')
-    echo "DELETING $TAG..."
-    delete_tag $TAG
-  done < $FILE
-fi
+echo && echo "DELETING:"
+while read LINE; do
+  TAG=$(echo $LINE | jq -r '.name')
+  delete_tag $TAG
+  echo " ✓ $TAG"
+done < $FILE
+
+echo
+echo "######################### DONE #########################"
+echo

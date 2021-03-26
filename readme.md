@@ -1,20 +1,19 @@
-# dtr-prune
+# mrs-tag-cleanup
 
-Run
+## get-tags
 
 ``` sh
-ORG="gui"
-REPO="my-repo"
-
-mkdir -p temp/${ORG}
-sh get-tags.sh ${ORG}/${REPO}
-
-code temp/${ORG}/${REPO}.json
+sh get-tags.sh "my.msr-registry.com/org/my-service"
 ```
 
-**WARNING!**
-Remove all `tags` you wish to keep!!!
+## del-tags
+
+> **WARNING!**
+>
+> See tags output file located in `./temp`
+>
+> **REMOVE** all `tags` you wish to **KEEP**!!!
 
 ``` sh
-sh del-tags.sh ${ORG}/${REPO}
+sh del-tags.sh "my.msr-registry.com/org/my-service"
 ```
