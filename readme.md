@@ -1,12 +1,16 @@
-# msr-tag-cleanup
+# MSR Tag Cleanup
 
-## who is this for?
+## Who is this for?
 
-For those using Mirantis Secure Registry (MSR) -- formerly Docker Trusted Registry (DTR).
+For those using **Mirantis Secure Registry** (**MSR**) - _formerly **Docker Trusted Registry** (**DTR**)_.
 
 If you have hundreds of tags you wish to clean up, the MSR UI can be less than optimal.
 
-## get tags
+## Requirements
+
+`jq`: can be obtained here: <https://stedolan.github.io/jq/download/>
+
+## Get Tags
 
 Run `get-tags.sh` to get all tags for a given repo:
 
@@ -14,7 +18,7 @@ Run `get-tags.sh` to get all tags for a given repo:
 sh get-tags.sh "my.msr-registry.com/org/my-service"
 ```
 
-## delete tags
+## Delete Tags
 
 After running `get-tags.sh`, review the output before continuing.
 
@@ -29,3 +33,9 @@ Run `del-tags.sh` to delete all tags saved in the output file.
 ``` sh
 sh del-tags.sh "my.msr-registry.com/org/my-service"
 ```
+
+## Troubleshooting
+
+### I get an error with `immutability` turned on
+
+> You cannot delete tags with immutability on. Turn immutability off, delete, then re-enable as needed.
