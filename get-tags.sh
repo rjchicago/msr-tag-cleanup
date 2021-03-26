@@ -14,8 +14,8 @@ if [[ -z $IMAGE ]] ; then
 fi
 
 MSR_URL=$(echo $IMAGE  | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\1/p')
-ORG=$(echo $IMAGE  | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\2/p')
-REPO=$(echo $IMAGE | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\3/p')
+ORG=$(echo $IMAGE      | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\2/p')
+REPO=$(echo $IMAGE     | sed -n -e 's/\([^\/]*\)\/\([^\/]*\)\/\(.*\)/\3/p')
 
 mkdir -p temp/${ORG}
 FILE="temp/${ORG}/${REPO}.json"
