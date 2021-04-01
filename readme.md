@@ -36,7 +36,7 @@ sh del-tags.sh "my.msr-registry.com/org/my-service"
 
 ## Update Tag Limit
 
-Per [documentation](https://docs.mirantis.com/containers/v3.1/dockeree-products/msr/msr-user/tag-pruning.html#set-a-tag-limit), users are supposed to be able to set a repositories tag limit. However, this option does not appear unless you have uber admin privileges.
+Per [documentation](https://docs.mirantis.com/containers/v3.1/dockeree-products/msr/msr-user/tag-pruning.html#set-a-tag-limit), users are supposed to be able to set tag limits on repositories. However, this option does not appear unless you have uber admin privileges.
 
 A workaround is to use the MSR API to PATCH the specified repository. See `update_tag_limit.sh`:
 
