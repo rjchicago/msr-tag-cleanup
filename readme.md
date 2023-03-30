@@ -15,7 +15,16 @@ If you have hundreds of tags you wish to clean up, the MSR UI can be less than o
 Run `get-tags.sh` to get all tags for a given repo:
 
 ``` sh
-sh get-tags.sh "my.msr-registry.com/org/my-service"
+IMAGE=my.msr-registry.com/org/my-service
+sh get-tags.sh $IMAGE
+```
+
+NOTE: you may optionally limit tags by date. The default is to only return tags updated older than 182 days ago. To return more recent tags, pass "DAYS" in the second argument:
+
+``` sh
+IMAGE=my.msr-registry.com/org/my-service
+DAYS=90
+sh get-tags.sh $IMAGE $DAYS
 ```
 
 ## Delete Tags
@@ -31,7 +40,8 @@ After running `get-tags.sh`, review the output before continuing.
 Run `del-tags.sh` to delete all tags saved in the output file.
 
 ``` sh
-sh del-tags.sh "my.msr-registry.com/org/my-service"
+IMAGE=my.msr-registry.com/org/my-service
+sh del-tags.sh $IMAGE
 ```
 
 ## Update Tag Limit
@@ -41,7 +51,9 @@ Per [documentation](https://docs.mirantis.com/containers/v3.1/dockeree-products/
 A workaround is to use the MSR API to PATCH the specified repository. See `update_tag_limit.sh`:
 
 ``` sh
-sh update_tag_limit.sh my.msr-registry.com/org/my-service 50
+IMAGE=my.msr-registry.com/org/my-service
+LIMIT=50
+sh update_tag_limit.sh $IMAGE $LIMIT
 ```
 
 ## Troubleshooting

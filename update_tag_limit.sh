@@ -6,8 +6,12 @@ cleanup() {
   # script cleanup here
 }
 
-MSR_USER=
-MSR_PASSWORD=
+if [[ -f .env ]]; then
+  set -a; source .env; set +a
+fi
+
+MSR_USER=${MSR_USER:-}
+MSR_PASSWORD=${MSR_PASSWORD:-}
 
 IMAGE=${1:-}
 if [[ -z $IMAGE ]] ; then
