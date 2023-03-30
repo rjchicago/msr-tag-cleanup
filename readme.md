@@ -19,12 +19,21 @@ IMAGE=my.msr-registry.com/org/my-service
 sh get-tags.sh $IMAGE
 ```
 
-NOTE: you may optionally limit tags by date. The default is to only return tags updated older than 182 days ago. To return more recent tags, pass "DAYS" in the second argument:
+NOTE: You may optionally limit tags by date. The default is to only return tags updated older than 182 days ago. To return more recent tags, pass "DAYS" in the second argument:
 
 ``` sh
 IMAGE=my.msr-registry.com/org/my-service
 DAYS=90
 sh get-tags.sh $IMAGE $DAYS
+```
+
+NOTE: Repos with many tags may time out with large page sizes. The default page size is 100. You may try larger or smaller pages sizes via the third argument:
+
+``` sh
+IMAGE=my.msr-registry.com/org/my-service
+DAYS=0
+SIZE=50
+sh get-tags.sh $IMAGE $DAYS $SIZE
 ```
 
 ## Delete Tags
